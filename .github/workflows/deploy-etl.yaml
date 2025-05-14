@@ -19,7 +19,8 @@ jobs:
       - name: Deploy via SSH
         run: |
           ssh -o StrictHostKeyChecking=no root@137.184.183.44 \
-            "git -C ~/etl-pipeline pull origin main && \
-            cd ~/etl-pipeline && \
-            python3 -m pip install -r requirements.txt && \
+            "mkdir -p /root/etl-pipeline && \
+            git -C /root/etl-pipeline pull || git clone https://github.com/Daniishkhan/etl-pipeline.git /root/etl-pipeline && \
+            cd /root/etl-pipeline && \
+            pip install -r requirements.txt && \
             python3 etl_scripts/main.py"
