@@ -20,7 +20,19 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no root@137.184.183.44 \
             "mkdir -p /root/etl-pipeline && \
-            git -C /root/etl-pipeline pull || git clone https://github.com/Daniishkhan/etl-pipeline.git /root/etl-pipeline && \
+            # Install Python/pip if missing
+            if ! command -v python3 &> /dev/null; then \
+              apt update && apt install -y python3 python3-pip python3-venv; \
+            fi && \
+            # Clone or pull repo
+            if [ -d /root/etl-pipeline/.git ]; then \
+              git -C /root/etl-pipeline pull origin main; \
+            else \
+              git clone https://github.com/your-username/etl-pipeline.git /root/etl-pipeline; \
+            fi && \
+            # Set up virtual environment
             cd /root/etl-pipeline && \
+            python3 -m venv venv && \
+            . venv/bin/activate && \
             pip install -r requirements.txt && \
-            python3 etl_scripts/main.py"
+            python etl_scripts/main.py"
