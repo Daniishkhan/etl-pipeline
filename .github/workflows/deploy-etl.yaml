@@ -1,0 +1,25 @@
+name: Deploy ETL Pipeline
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Add SSH key
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
+
+      - name: Deploy via SSH
+        run: |
+          ssh -o StrictHostKeyChecking=no root@137.184.183.44 \
+            "git -C ~/etl-pipeline pull origin main && \
+            cd ~/etl-pipeline && \
+            python3 -m pip install -r requirements.txt && \
+            python3 etl_scripts/main.py"
